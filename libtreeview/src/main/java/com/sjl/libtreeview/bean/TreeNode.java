@@ -56,6 +56,9 @@ public class TreeNode<T> {
     }
 
     public void setChildNodes(List<TreeNode> childNodes) {
+        for (int i=0;childNodes!=null&&i<childNodes.size();i++){
+            childNodes.get(i).setParentNode(this);
+        }
         this.childNodes = childNodes;
     }
 
