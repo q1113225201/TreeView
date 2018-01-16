@@ -16,16 +16,13 @@ import java.util.List;
  * @author 林zero
  * @date 2018/1/14
  */
-
 public abstract class BaseTreeViewAdapter<V extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<V> {
-    protected Context mContext;
 
     protected List<TreeNode> list;
 
     protected List<TreeNode> expandedList = new ArrayList<>();
 
-    public BaseTreeViewAdapter(Context mContext, List<TreeNode> list) {
-        this.mContext = mContext;
+    public BaseTreeViewAdapter(List<TreeNode> list) {
         this.list = list;
         buildExpandedList();
     }
