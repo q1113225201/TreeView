@@ -9,7 +9,7 @@ import java.util.List;
  * @date 2018/1/14
  */
 
-public class TreeNode<T> {
+public class TreeNode<T extends LayoutItem> {
     /**
      * 当前节点值
      */

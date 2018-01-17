@@ -7,13 +7,17 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
+import com.sjl.libtreeview.TreeViewAdapter;
 import com.sjl.libtreeview.bean.TreeNode;
-import com.sjl.treeview.adapter.TreeViewAdapter;
 import com.sjl.treeview.bean.BranchNode;
+import com.sjl.treeview.bean.BranchViewBinder;
 import com.sjl.treeview.bean.LeafNode;
+import com.sjl.treeview.bean.LeafViewBinder;
 import com.sjl.treeview.bean.RootNode;
+import com.sjl.treeview.bean.RootViewBinder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends Activity {
@@ -37,7 +41,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 list.clear();
                 list.addAll(initTree());
-                adapter.notifyData();
+                adapter.notifyData(list);
             }
         });
         initAdapter();
@@ -45,7 +49,7 @@ public class MainActivity extends Activity {
 
     private void initAdapter() {
         Log.i(TAG, list.size() + "");
-        adapter = new TreeViewAdapter(this, list);
+        adapter = new TreeViewAdapter(list,Arrays.asList(new RootViewBinder(),new BranchViewBinder(),new LeafViewBinder()));
         rv.setAdapter(adapter);
         rv.setLayoutManager(new LinearLayoutManager(this));
     }

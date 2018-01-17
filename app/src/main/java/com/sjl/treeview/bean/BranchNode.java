@@ -1,5 +1,8 @@
 package com.sjl.treeview.bean;
 
+import com.sjl.libtreeview.bean.LayoutItem;
+import com.sjl.treeview.R;
+
 /**
  * BranchNode
  *
@@ -7,7 +10,7 @@ package com.sjl.treeview.bean;
  * @date 2018/1/14
  */
 
-public class BranchNode {
+public class BranchNode implements LayoutItem {
     private String name;
 
     public BranchNode(String name) {
@@ -20,5 +23,10 @@ public class BranchNode {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.item_branch;
     }
 }

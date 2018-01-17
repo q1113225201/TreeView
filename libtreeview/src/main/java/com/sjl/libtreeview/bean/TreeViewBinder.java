@@ -10,9 +10,9 @@ import android.view.View;
  * @date 2018/1/16
  */
 public abstract class TreeViewBinder<VH extends RecyclerView.ViewHolder> implements LayoutItem {
-    abstract VH creatViewHolder(View itemView);
+    public abstract VH creatViewHolder(View itemView);
 
-    abstract void bindViewHolder(VH holder, int position, TreeNode treeNode);
+    public abstract void bindViewHolder(VH holder, int position, TreeNode treeNode);
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
