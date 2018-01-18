@@ -1,5 +1,6 @@
 package com.sjl.libtreeview.bean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,15 +22,19 @@ public class TreeNode<T extends LayoutItem> {
     /**
      * 孩子节点列表
      */
-    private List<TreeNode> childNodes;
+    private List<TreeNode> childNodes = new ArrayList<>();
     /**
      * 是否已展开
      */
-    private boolean isExpanded;
+    private boolean expanded;
     /**
      * 是否被选中
      */
-    private boolean isSelected;
+    private boolean selected;
+    /**
+     * 层级
+     */
+    private int level = 0;
 
     public TreeNode(T value) {
         this.value = value;
@@ -56,25 +61,88 @@ public class TreeNode<T extends LayoutItem> {
     }
 
     public void setChildNodes(List<TreeNode> childNodes) {
-        for (int i=0;childNodes!=null&&i<childNodes.size();i++){
+        if (childNodes == null) {
+            childNodes = new ArrayList<>();
+        }
+        for (int i = 0; i < childNodes.size(); i++) {
             childNodes.get(i).setParentNode(this);
         }
+        initLevel(childNodes);
         this.childNodes = childNodes;
     }
 
     public boolean isExpanded() {
-        return isExpanded;
+        return expanded;
     }
 
     public void setExpanded(boolean expanded) {
-        isExpanded = expanded;
+        this.expanded = expanded;
     }
 
     public boolean isSelected() {
-        return isSelected;
+        return selected;
     }
 
     public void setSelected(boolean selected) {
-        isSelected = selected;
+        this.selected = selected;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public boolean toggle() {
+        expanded = !expanded;
+        return expanded;
+    }
+
+    public boolean open() {
+        expanded = true;
+        return expanded;
+    }
+
+    public boolean close() {
+        expanded = false;
+        return expanded;
+    }
+
+    public boolean isRoot() {
+        return parentNode == null;
+    }
+
+    public boolean isLeaf() {
+        return childNodes == null || childNodes.isEmpty();
+    }
+
+    public void addChild(TreeNode treeNode) {
+        if (childNodes == null) {
+            childNodes = new ArrayList<>();
+        }
+        childNodes.add(treeNode);
+        initLevel(childNodes);
+    }
+
+    private void initLevel(List<TreeNode> childNodes) {
+        for (TreeNode item : childNodes) {
+            item.setLevel(item.getParentNode().getLevel() + 1);
+            if (!item.getChildNodes().isEmpty()) {
+                initLevel(item.childNodes);
+            }
+        }
+
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        TreeNode treeNode = (TreeNode) obj;
+        return value.equals(treeNode.getValue())
+                && ((parentNode != null && parentNode.equals(treeNode.getParentNode())) || (parentNode == null && treeNode.getParentNode() == null))
+                && childNodes.equals(treeNode.getChildNodes())
+                && expanded == treeNode.isExpanded()
+                && selected == treeNode.isSelected();
     }
 }

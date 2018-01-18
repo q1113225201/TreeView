@@ -57,21 +57,32 @@ public class MainActivity extends Activity {
     private List<TreeNode> initTree() {
         List<TreeNode> rootList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            TreeNode<RootNode> node = new TreeNode<>(new RootNode("根" + i));
-            node.setChildNodes(initBranchs(node, node.getValue().getName()));
+            TreeNode<RootNode> node = new TreeNode<>(new RootNode("根---" + i));
+            if(i%2==0) {
+                node.setChildNodes(initBranchs(node, node.getValue().getName()));
+            }else{
+                node.setChildNodes(initLeaves(node, node.getValue().getName()));
+            }
             rootList.add(node);
-            Log.i(TAG, "Tree" + i + i);
         }
         return rootList;
     }
-
+    int count = 5;
     private List<TreeNode> initBranchs(TreeNode treeNode, String name) {
         List<TreeNode> branchList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            TreeNode<BranchNode> node = new TreeNode<>(new BranchNode("枝" + i));
-            node.setChildNodes(initLeaves(node, node.getValue().getName()));
+            TreeNode<BranchNode> node = new TreeNode<>(new BranchNode(name+"枝---" + i));
+            if(i%2==0) {
+                node.setChildNodes(initLeaves(node, node.getValue().getName()));
+            }else {
+                if (count > 0) {
+                    count--;
+                    node.setChildNodes(initBranchs(node, node.getValue().getName()));
+                }else{
+                    node.setChildNodes(initLeaves(node, node.getValue().getName()));
+                }
+            }
             branchList.add(node);
-            Log.i(TAG, name + i);
         }
         return branchList;
     }
@@ -79,9 +90,8 @@ public class MainActivity extends Activity {
     private List<TreeNode> initLeaves(TreeNode treeNode, String name) {
         List<TreeNode> leafList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            TreeNode<LeafNode> node = new TreeNode<>(new LeafNode("叶" + i));
+            TreeNode<LeafNode> node = new TreeNode<>(new LeafNode(name+"叶---" + i));
             leafList.add(node);
-            Log.i(TAG, name + i);
         }
         return leafList;
     }

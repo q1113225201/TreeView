@@ -28,12 +28,7 @@ public class RootViewBinder extends TreeViewBinder<RootViewBinder.ViewHolder> {
     @Override
     public void bindViewHolder(ViewHolder holder, int position, TreeNode treeNode) {
         ((TextView)holder.findViewById(R.id.tvName)).setText(((RootNode)treeNode.getValue()).getName());
-        holder.findViewById(R.id.tvName).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-            }
-        });
     }
 
     class ViewHolder extends TreeViewBinder.ViewHolder{
