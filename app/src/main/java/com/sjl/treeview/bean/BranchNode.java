@@ -29,4 +29,14 @@ public class BranchNode implements LayoutItem {
     public int getLayoutId() {
         return R.layout.item_branch;
     }
+
+    @Override
+    public int getToggleId() {
+        return R.id.ivNode;
+    }
+
+    @Override
+    public int getCheckedId() {
+        return R.id.tvName;
+    }
 }

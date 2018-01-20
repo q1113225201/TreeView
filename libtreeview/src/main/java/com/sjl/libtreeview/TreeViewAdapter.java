@@ -18,7 +18,7 @@ import java.util.List;
  * @author 林zero
  * @date 2018/1/14
  */
-public class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     protected List<TreeNode> expandedList = new ArrayList<>();
     private List<? extends TreeViewBinder> viewBinders = new ArrayList<>();
@@ -37,6 +37,7 @@ public class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     /**
      * 构建显示的展开列表
+     *
      * @param list
      */
     private void buildExpandedList(List<TreeNode> list) {
@@ -47,6 +48,7 @@ public class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     /**
      * 构建节点
+     *
      * @param expandedList
      * @param list
      */
@@ -88,27 +90,85 @@ public class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     @Override
-    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
+        TreeNode treeNode = expandedList.get(position);
         holder.itemView.setPadding(expandedList.get(position).getLevel() * padding, 0, 0, 0);
-        ((TreeViewBinder.ViewHolder) holder).itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggle(holder.getLayoutPosition());
-            }
-        });
-        for (TreeViewBinder item : viewBinders) {
+        for (final TreeViewBinder item : viewBinders) {
             if (item.getLayoutId() == expandedList.get(position).getValue().getLayoutId()) {
-                item.bindViewHolder(holder, position, expandedList.get(position));
+                item.bindViewHolder(holder, position, expandedList.get(holder.getLayoutPosition()));
+                if (item.getToggleId()!=0) {
+                    ((TreeViewBinder.ViewHolder) holder).findViewById(item.getToggleId()).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+//                            toggle(holder.getLayoutPosition());
+                            toggle(expandedList.get(holder.getLayoutPosition()));
+                            toggle(v, expandedList.get(holder.getLayoutPosition()));
+                        }
+                    });
+                }
+                if (item.getCheckedId()!=0) {
+                    ((TreeViewBinder.ViewHolder) holder).findViewById(item.getCheckedId()).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+//                            boolean checked = checked(holder.getLayoutPosition());
+                            boolean checked = checked(expandedList.get(holder.getLayoutPosition()));
+                            checked(v, checked, expandedList.get(holder.getLayoutPosition()));
+                        }
+                    });
+                }
+                ((TreeViewBinder.ViewHolder) holder).itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        itemClick(v, expandedList.get(holder.getLayoutPosition()));
+                    }
+                });
             }
         }
     }
 
     /**
-     * 节点展开收拢
-     * @param position
+     * 改变当前节点、父节点和子节点的选中状态
+     * @param currentNode
+     * @return
      */
-    public void toggle(int position) {
-        TreeNode currentNode = expandedList.get(position);
+    private boolean checked(TreeNode currentNode) {
+        boolean isChecked = !currentNode.isChecked();
+        int startPosition = expandedList.indexOf(currentNode);
+        //选中子节点
+        notifyItemRangeChanged(startPosition, checkChildren(currentNode, isChecked)+1);
+        //选中父节点
+        TreeNode parentNode = currentNode.getParentNode();
+        while(parentNode!=null){
+            int index = expandedList.indexOf(parentNode);
+            parentNode.setChecked(isChecked);
+            notifyItemChanged(index);
+            parentNode = parentNode.getParentNode();
+        }
+        return isChecked;
+    }
+
+    /**
+     * 改变所有子节点选中状态
+     * @param treeNode
+     * @param isChecked
+     * @return
+     */
+    private int checkChildren(TreeNode treeNode, boolean isChecked) {
+        treeNode.setChecked(isChecked);
+        List<TreeNode> list = treeNode.getChildNodes();
+        int count = treeNode.isExpanded()?list.size():0;
+        for (TreeNode item : list) {
+            count += checkChildren(item, isChecked);
+        }
+        return count;
+    }
+
+    /**
+     * 节点展开收拢
+     *
+     * @param currentNode
+     */
+    public void toggle(TreeNode currentNode) {
         boolean isExpanded = currentNode.isExpanded();
         int startPosition = expandedList.indexOf(currentNode) + 1;
         if (isExpanded) {
@@ -120,6 +180,7 @@ public class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     /**
      * 收拢时移除节点
+     *
      * @param treeNode
      * @param toggle
      * @return
@@ -145,6 +206,7 @@ public class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     /**
      * 展开时插入节点
+     *
      * @param treeNode
      * @param startPosition
      * @return
@@ -177,4 +239,11 @@ public class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void setPadding(int padding) {
         this.padding = padding;
     }
+
+    public abstract void toggle(View view, TreeNode treeNode);
+
+    public abstract void checked(View view, boolean checked, TreeNode treeNode);
+
+    public abstract void itemClick(View view, TreeNode treeNode);
+
 }

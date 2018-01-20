@@ -4,9 +4,16 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
+    <ImageView
+        android:id="@+id/ivNode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ic_tree_node" />
+
     <TextView
         android:id="@+id/tvName"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
         android:textSize="18sp" />

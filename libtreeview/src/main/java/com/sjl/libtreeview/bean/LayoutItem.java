@@ -8,4 +8,8 @@ package com.sjl.libtreeview.bean;
  */
 public interface LayoutItem {
     int getLayoutId();
+
+    int getToggleId();
+
+    int getCheckedId();
 }

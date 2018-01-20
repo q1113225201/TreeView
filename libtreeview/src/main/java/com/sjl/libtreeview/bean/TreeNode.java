@@ -30,7 +30,7 @@ public class TreeNode<T extends LayoutItem> {
     /**
      * 是否被选中
      */
-    private boolean selected;
+    private boolean checked;
     /**
      * 层级
      */
@@ -79,12 +79,12 @@ public class TreeNode<T extends LayoutItem> {
         this.expanded = expanded;
     }
 
-    public boolean isSelected() {
-        return selected;
+    public boolean isChecked() {
+        return checked;
     }
 
-    public void setSelected(boolean selected) {
-        this.selected = selected;
+    public void setChecked(boolean checked) {
+        this.checked = checked;
     }
 
     public int getLevel() {
@@ -143,6 +143,6 @@ public class TreeNode<T extends LayoutItem> {
                 && ((parentNode != null && parentNode.equals(treeNode.getParentNode())) || (parentNode == null && treeNode.getParentNode() == null))
                 && childNodes.equals(treeNode.getChildNodes())
                 && expanded == treeNode.isExpanded()
-                && selected == treeNode.isSelected();
+                && checked == treeNode.isChecked();
     }
 }

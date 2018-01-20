@@ -21,17 +21,28 @@ public class RootViewBinder extends TreeViewBinder<RootViewBinder.ViewHolder> {
     }
 
     @Override
+    public int getToggleId() {
+        return R.id.ivNode;
+    }
+
+    @Override
+    public int getCheckedId() {
+        return R.id.tvName;
+    }
+
+    @Override
     public ViewHolder creatViewHolder(View itemView) {
         return new ViewHolder(itemView);
     }
 
     @Override
     public void bindViewHolder(ViewHolder holder, int position, TreeNode treeNode) {
-        ((TextView)holder.findViewById(R.id.tvName)).setText(((RootNode)treeNode.getValue()).getName());
-
+        ((TextView) holder.findViewById(R.id.tvName)).setText(((RootNode) treeNode.getValue()).getName());
+        ((TextView) holder.findViewById(R.id.tvName)).setTextColor(holder.itemView.getContext().getResources().getColor(treeNode.isChecked() ? R.color.colorAccent : R.color.colorPrimary));
+        holder.findViewById(R.id.ivNode).setRotation(treeNode.isExpanded()?90:0);
     }
 
-    class ViewHolder extends TreeViewBinder.ViewHolder{
+    class ViewHolder extends TreeViewBinder.ViewHolder {
 
         public ViewHolder(View itemView) {
             super(itemView);

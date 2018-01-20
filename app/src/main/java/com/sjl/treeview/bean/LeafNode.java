@@ -29,4 +29,14 @@ public class LeafNode implements LayoutItem {
     public int getLayoutId() {
         return R.layout.item_leaf;
     }
+
+    @Override
+    public int getToggleId() {
+        return R.id.ivNode;
+    }
+
+    @Override
+    public int getCheckedId() {
+        return R.id.tvName;
+    }
 }
