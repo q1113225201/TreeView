@@ -1,7 +1,6 @@
 package com.sjl.libtreeview;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +42,6 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
     private void buildExpandedList(List<TreeNode> list) {
         expandedList.clear();
         buildNodes(expandedList, list);
-        Log.i("buildExpandedList", expandedList.size() + "");
     }
 
     /**
@@ -91,43 +89,43 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
-        TreeNode treeNode = expandedList.get(position);
         holder.itemView.setPadding(expandedList.get(position).getLevel() * padding, 0, 0, 0);
         for (final TreeViewBinder item : viewBinders) {
             if (item.getLayoutId() == expandedList.get(position).getValue().getLayoutId()) {
                 item.bindViewHolder(holder, position, expandedList.get(holder.getLayoutPosition()));
-                if (item.getToggleId()!=0) {
+                if (item.getToggleId() != 0) {
                     ((TreeViewBinder.ViewHolder) holder).findViewById(item.getToggleId()).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-//                            toggle(holder.getLayoutPosition());
                             toggle(expandedList.get(holder.getLayoutPosition()));
                             toggle(v, expandedList.get(holder.getLayoutPosition()));
                         }
                     });
                 }
-                if (item.getCheckedId()!=0) {
+                if (item.getCheckedId() != 0) {
                     ((TreeViewBinder.ViewHolder) holder).findViewById(item.getCheckedId()).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-//                            boolean checked = checked(holder.getLayoutPosition());
                             boolean checked = checked(expandedList.get(holder.getLayoutPosition()));
                             checked(v, checked, expandedList.get(holder.getLayoutPosition()));
                         }
                     });
                 }
-                ((TreeViewBinder.ViewHolder) holder).itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        itemClick(v, expandedList.get(holder.getLayoutPosition()));
-                    }
-                });
+                if (item.getClickId() != 0) {
+                    ((TreeViewBinder.ViewHolder) holder).findViewById(item.getClickId()).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            itemClick(v, expandedList.get(holder.getLayoutPosition()));
+                        }
+                    });
+                }
             }
         }
     }
 
     /**
      * 改变当前节点、父节点和子节点的选中状态
+     *
      * @param currentNode
      * @return
      */
@@ -135,10 +133,10 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
         boolean isChecked = !currentNode.isChecked();
         int startPosition = expandedList.indexOf(currentNode);
         //选中子节点
-        notifyItemRangeChanged(startPosition, checkChildren(currentNode, isChecked)+1);
+        notifyItemRangeChanged(startPosition, checkChildren(currentNode, isChecked) + 1);
         //选中父节点
         TreeNode parentNode = currentNode.getParentNode();
-        while(parentNode!=null){
+        while (parentNode != null) {
             int index = expandedList.indexOf(parentNode);
             parentNode.setChecked(isChecked);
             notifyItemChanged(index);
@@ -149,6 +147,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
     /**
      * 改变所有子节点选中状态
+     *
      * @param treeNode
      * @param isChecked
      * @return
@@ -156,7 +155,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
     private int checkChildren(TreeNode treeNode, boolean isChecked) {
         treeNode.setChecked(isChecked);
         List<TreeNode> list = treeNode.getChildNodes();
-        int count = treeNode.isExpanded()?list.size():0;
+        int count = treeNode.isExpanded() ? list.size() : 0;
         for (TreeNode item : list) {
             count += checkChildren(item, isChecked);
         }

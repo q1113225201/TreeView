@@ -6,6 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.sjl.libtreeview.TreeViewAdapter;
 import com.sjl.libtreeview.bean.LayoutItem;
@@ -49,7 +50,6 @@ public class MainActivity extends Activity {
     }
 
     private void initAdapter() {
-        Log.i(TAG, list.size() + "");
         adapter = new TreeViewAdapter(list, Arrays.asList(new RootViewBinder(), new BranchViewBinder(), new LeafViewBinder())) {
             @Override
             public void toggle(View view, TreeNode treeNode) {
@@ -74,7 +74,7 @@ public class MainActivity extends Activity {
                 }else if(item instanceof LeafNode){
                     name = ((LeafNode) item).getName();
                 }
-                Log.i(TAG,name+","+treeNode.isChecked()+","+treeNode.isExpanded()+","+treeNode.isRoot()+","+treeNode.isLeaf()+","+treeNode.getLevel());
+                Toast.makeText(MainActivity.this, name, Toast.LENGTH_SHORT).show();
             }
         };
         rv.setAdapter(adapter);
@@ -84,7 +84,7 @@ public class MainActivity extends Activity {
     private List<TreeNode> initTree() {
         List<TreeNode> rootList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            TreeNode<RootNode> node = new TreeNode<>(new RootNode("根---" + i));
+            TreeNode<RootNode> node = new TreeNode<>(new RootNode("根" + i));
             if (i % 2 == 0) {
                 node.setChildNodes(initBranchs(node, node.getValue().getName()));
             } else {
@@ -100,7 +100,7 @@ public class MainActivity extends Activity {
     private List<TreeNode> initBranchs(TreeNode treeNode, String name) {
         List<TreeNode> branchList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            TreeNode<BranchNode> node = new TreeNode<>(new BranchNode(name + "枝---" + i));
+            TreeNode<BranchNode> node = new TreeNode<>(new BranchNode(name + "枝" + i));
             if (i % 2 == 0) {
                 node.setChildNodes(initLeaves(node, node.getValue().getName()));
             } else {
@@ -119,7 +119,7 @@ public class MainActivity extends Activity {
     private List<TreeNode> initLeaves(TreeNode treeNode, String name) {
         List<TreeNode> leafList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            TreeNode<LeafNode> node = new TreeNode<>(new LeafNode(name + "叶---" + i));
+            TreeNode<LeafNode> node = new TreeNode<>(new LeafNode(name + "叶" + i));
             leafList.add(node);
         }
         return leafList;

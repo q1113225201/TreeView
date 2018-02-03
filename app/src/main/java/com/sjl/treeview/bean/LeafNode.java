@@ -32,11 +32,16 @@ public class LeafNode implements LayoutItem {
 
     @Override
     public int getToggleId() {
-        return R.id.ivNode;
+        return 0;
     }
 
     @Override
     public int getCheckedId() {
+        return R.id.ivCheck;
+    }
+
+    @Override
+    public int getClickId() {
         return R.id.tvName;
     }
 }

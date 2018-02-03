@@ -12,4 +12,6 @@ public interface LayoutItem {
     int getToggleId();
 
     int getCheckedId();
+
+    int getClickId();
 }

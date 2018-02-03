@@ -1,6 +1,7 @@
 package com.sjl.treeview.bean;
 
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.sjl.libtreeview.bean.TreeNode;
@@ -28,6 +29,11 @@ public class BranchViewBinder extends TreeViewBinder<BranchViewBinder.ViewHolder
 
     @Override
     public int getCheckedId() {
+        return R.id.ivCheck;
+    }
+
+    @Override
+    public int getClickId() {
         return R.id.tvName;
     }
 
@@ -39,8 +45,9 @@ public class BranchViewBinder extends TreeViewBinder<BranchViewBinder.ViewHolder
     @Override
     public void bindViewHolder(ViewHolder holder, int position, TreeNode treeNode) {
         ((TextView) holder.findViewById(R.id.tvName)).setText(((BranchNode) treeNode.getValue()).getName());
-        ((TextView) holder.findViewById(R.id.tvName)).setTextColor(holder.itemView.getContext().getResources().getColor(treeNode.isChecked() ? R.color.colorAccent : R.color.colorPrimary));
-        holder.findViewById(R.id.ivNode).setRotation(treeNode.isExpanded()?90:0);
+        holder.findViewById(R.id.ivNode).setRotation(treeNode.isExpanded() ? 90 : 0);
+        ((ImageView) holder.findViewById(R.id.ivCheck)).setImageResource(treeNode.isChecked() ? R.drawable.ic_checked : R.drawable.ic_uncheck);
+        holder.findViewById(R.id.llParent).setBackgroundColor(holder.itemView.getContext().getResources().getColor(treeNode.isChecked() ? R.color.gray : R.color.white));
     }
 
     class ViewHolder extends TreeViewBinder.ViewHolder {

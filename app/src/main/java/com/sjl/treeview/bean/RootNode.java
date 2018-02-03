@@ -37,6 +37,11 @@ public class RootNode implements LayoutItem {
 
     @Override
     public int getCheckedId() {
+        return R.id.ivCheck;
+    }
+
+    @Override
+    public int getClickId() {
         return R.id.tvName;
     }
 }
