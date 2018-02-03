@@ -1,15 +1,15 @@
 apply plugin: 'com.android.library'
-
+//添加complie生成依赖
+apply plugin: 'com.github.dcendents.android-maven'
+group='com.github.q1113225201'//最后一个是github账号
 android {
     compileSdkVersion 26
-
-
 
     defaultConfig {
         minSdkVersion 18
         targetSdkVersion 26
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
