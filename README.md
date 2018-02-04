@@ -8,5 +8,7 @@
 
 ``compile 'com.github.q1113225201:TreeView:1.0.2'``
 
+具体使用可参考[博客](http://blog.csdn.net/q1113225201/article/details/79252546)或[项目中MainActivity.java](https://github.com/q1113225201/TreeView/blob/master/app/src/main/java/com/sjl/treeview/MainActivity.java)
+
 ## 效果展示
 ![url](show.gif)
