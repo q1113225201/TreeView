@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TreeNode
+ * 节点对象
  *
  * @author 林zero
  * @date 2018/1/14

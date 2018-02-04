@@ -42,7 +42,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 list.clear();
-                list.addAll(initTree());
+                list.addAll(initRoot());
                 adapter.notifyData(list);
             }
         });
@@ -81,14 +81,18 @@ public class MainActivity extends Activity {
         rv.setLayoutManager(new LinearLayoutManager(this));
     }
 
-    private List<TreeNode> initTree() {
+    /**
+     * 初始化跟
+     * @return
+     */
+    private List<TreeNode> initRoot() {
         List<TreeNode> rootList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             TreeNode<RootNode> node = new TreeNode<>(new RootNode("根" + i));
             if (i % 2 == 0) {
-                node.setChildNodes(initBranchs(node, node.getValue().getName()));
+                node.setChildNodes(initBranchs(node.getValue().getName()));
             } else {
-                node.setChildNodes(initLeaves(node, node.getValue().getName()));
+                node.setChildNodes(initLeaves(node.getValue().getName()));
             }
             rootList.add(node);
         }
@@ -97,18 +101,23 @@ public class MainActivity extends Activity {
 
     int count = 5;
 
-    private List<TreeNode> initBranchs(TreeNode treeNode, String name) {
+    /**
+     * 初始化枝
+     * @param name
+     * @return
+     */
+    private List<TreeNode> initBranchs(String name) {
         List<TreeNode> branchList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             TreeNode<BranchNode> node = new TreeNode<>(new BranchNode(name + "枝" + i));
             if (i % 2 == 0) {
-                node.setChildNodes(initLeaves(node, node.getValue().getName()));
+                node.setChildNodes(initLeaves(node.getValue().getName()));
             } else {
                 if (count > 0) {
                     count--;
-                    node.setChildNodes(initBranchs(node, node.getValue().getName()));
+                    node.setChildNodes(initBranchs(node.getValue().getName()));
                 } else {
-                    node.setChildNodes(initLeaves(node, node.getValue().getName()));
+                    node.setChildNodes(initLeaves(node.getValue().getName()));
                 }
             }
             branchList.add(node);
@@ -116,7 +125,12 @@ public class MainActivity extends Activity {
         return branchList;
     }
 
-    private List<TreeNode> initLeaves(TreeNode treeNode, String name) {
+    /**
+     * 初始化叶
+     * @param name
+     * @return
+     */
+    private List<TreeNode> initLeaves(String name) {
         List<TreeNode> leafList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             TreeNode<LeafNode> node = new TreeNode<>(new LeafNode(name + "叶" + i));

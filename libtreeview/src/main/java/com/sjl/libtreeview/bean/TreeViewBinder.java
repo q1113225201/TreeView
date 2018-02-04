@@ -4,7 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 /**
- * TreeViewBinder
+ * 属性节点视图绑定抽象
  *
  * @author 林zero
  * @date 2018/1/16

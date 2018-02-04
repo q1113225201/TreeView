@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TreeViewAdapter
+ * 树形适配器
  *
  * @author 林zero
  * @date 2018/1/14
@@ -21,6 +21,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
     protected List<TreeNode> expandedList = new ArrayList<>();
     private List<? extends TreeViewBinder> viewBinders = new ArrayList<>();
+    //根据层级设置左边padding
     private int padding = 30;
 
     public TreeViewAdapter(List<? extends TreeViewBinder> viewBinders) {
@@ -94,6 +95,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
             if (item.getLayoutId() == expandedList.get(position).getValue().getLayoutId()) {
                 item.bindViewHolder(holder, position, expandedList.get(holder.getLayoutPosition()));
                 if (item.getToggleId() != 0) {
+                    //展开收拢状态切换
                     ((TreeViewBinder.ViewHolder) holder).findViewById(item.getToggleId()).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -103,6 +105,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
                     });
                 }
                 if (item.getCheckedId() != 0) {
+                    //选中事件
                     ((TreeViewBinder.ViewHolder) holder).findViewById(item.getCheckedId()).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -112,6 +115,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
                     });
                 }
                 if (item.getClickId() != 0) {
+                    //单项点击事件
                     ((TreeViewBinder.ViewHolder) holder).findViewById(item.getClickId()).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
