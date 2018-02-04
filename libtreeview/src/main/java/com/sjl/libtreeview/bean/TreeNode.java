@@ -122,6 +122,7 @@ public class TreeNode<T extends LayoutItem> {
         if (childNodes == null) {
             childNodes = new ArrayList<>();
         }
+        treeNode.setParentNode(this);
         childNodes.add(treeNode);
         initLevel(childNodes);
     }

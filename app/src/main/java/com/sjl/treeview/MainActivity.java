@@ -46,6 +46,20 @@ public class MainActivity extends Activity {
                 adapter.notifyData(list);
             }
         });
+
+        TreeNode<RootNode> rootNode = new TreeNode<>(new RootNode("根节点"));
+        TreeNode<BranchNode> branchNode1 = new TreeNode<>(new BranchNode("枝节点1"));
+        TreeNode<BranchNode> branchNode2 = new TreeNode<>(new BranchNode("枝节点2"));
+        TreeNode<LeafNode> leafNode1 = new TreeNode<>(new LeafNode("叶节点1"));
+        TreeNode<LeafNode> leafNode2 = new TreeNode<>(new LeafNode("叶节点2"));
+        TreeNode<LeafNode> leafNode3 = new TreeNode<>(new LeafNode("叶节点3"));
+
+        rootNode.addChild(branchNode1);
+        rootNode.addChild(branchNode2);
+        branchNode1.addChild(leafNode1);
+        branchNode2.addChild(leafNode2);
+        branchNode2.addChild(leafNode3);
+        list.add(rootNode);
         initAdapter();
     }
 
@@ -54,13 +68,14 @@ public class MainActivity extends Activity {
             @Override
             public void toggle(View view, TreeNode treeNode) {
                 if(!(treeNode.getValue() instanceof LeafNode)) {
+                    //非叶节点时，旋转动画，具体效果自行添加
                     view.setRotation(view.getRotation() > 0 ? 0 : 90);
                 }
             }
 
             @Override
             public void checked(View view, boolean checked, TreeNode treeNode) {
-                //((TextView)view).setTextColor(view.getContext().getResources().getColor(checked?R.color.colorPrimary:R.color.colorAccent));
+
             }
 
             @Override
