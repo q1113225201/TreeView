@@ -7,10 +7,23 @@
     tools:context="com.sjl.treeview.MainActivity">
 
     <Button
+        android:id="@+id/btnLoad"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="加载"
-        android:id="@+id/btnLoad"/>
+        android:text="加载" />
+
+    <Button
+        android:id="@+id/btnCloseAll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="关闭所有" />
+
+    <ToggleButton
+        android:id="@+id/tbChoose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textOff="不选中父节点"
+        android:textOn="选中父节点" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv"

@@ -21,8 +21,14 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
     protected List<TreeNode> expandedList = new ArrayList<>();
     private List<? extends TreeViewBinder> viewBinders = new ArrayList<>();
-    //根据层级设置左边padding
+    /**
+     * 根据层级设置左边padding
+     */
     private int padding = 30;
+    /**
+     * 改变子节点选中是否改变父节点选中状态
+     */
+    private boolean changeParentCheck = false;
 
     public TreeViewAdapter(List<? extends TreeViewBinder> viewBinders) {
         this(null, viewBinders);
@@ -140,7 +146,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
         notifyItemRangeChanged(startPosition, checkChildren(currentNode, isChecked) + 1);
         //选中父节点
         TreeNode parentNode = currentNode.getParentNode();
-        while (parentNode != null) {
+        while (parentNode != null&&changeParentCheck) {
             int index = expandedList.indexOf(parentNode);
             parentNode.setChecked(isChecked);
             notifyItemChanged(index);
@@ -175,7 +181,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
         boolean isExpanded = currentNode.isExpanded();
         int startPosition = expandedList.indexOf(currentNode) + 1;
         if (isExpanded) {
-            notifyItemRangeRemoved(startPosition, removeNodes(currentNode, true));
+            notifyItemRangeRemoved(startPosition, removeNodes(currentNode, true,false));
         } else {
             notifyItemRangeInserted(startPosition, insertNodes(currentNode, startPosition));
         }
@@ -188,7 +194,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
      * @param toggle
      * @return
      */
-    private int removeNodes(TreeNode treeNode, boolean toggle) {
+    private int removeNodes(TreeNode treeNode, boolean toggle,boolean closeAll) {
         int count = 0;
         if (!treeNode.isLeaf()) {
             List<TreeNode> list = treeNode.getChildNodes();
@@ -196,9 +202,11 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
             expandedList.removeAll(list);
             for (TreeNode item : list) {
                 if (item.isExpanded()) {
-                    item.toggle();
+                    if(closeAll){
+                        item.toggle();
+                    }
+                    count += removeNodes(item, false,closeAll);
                 }
-                count += removeNodes(item, false);
             }
         }
         if (toggle) {
@@ -225,9 +233,25 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
             }
         }
         if (!treeNode.isExpanded()) {
-            treeNode.setExpanded(!treeNode.isExpanded());
+            treeNode.toggle();
         }
         return count;
+    }
+
+    /**
+     * 关闭所有节点
+     */
+    public void closeAll(){
+        List<TreeNode> tmp = new ArrayList<>();
+        for (TreeNode treeNode :expandedList){
+            if(treeNode.isRoot()){
+                tmp.add(treeNode);
+            }
+        }
+        for (TreeNode treeNode:tmp){
+            removeNodes(treeNode,treeNode.isExpanded(),true);
+        }
+        notifyDataSetChanged();
     }
 
     @Override
@@ -241,6 +265,14 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
     public void setPadding(int padding) {
         this.padding = padding;
+    }
+
+    public boolean isChangeParentCheck() {
+        return changeParentCheck;
+    }
+
+    public void setChangeParentCheck(boolean changeParentCheck) {
+        this.changeParentCheck = changeParentCheck;
     }
 
     public abstract void toggle(View view, TreeNode treeNode);

@@ -146,4 +146,12 @@ public class TreeNode<T extends LayoutItem> {
                 && expanded == treeNode.isExpanded()
                 && checked == treeNode.isChecked();
     }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        TreeNode<T> clone = new TreeNode<>(this.value);
+        clone.expanded = this.expanded;
+        clone.checked = this.checked;
+        return super.clone();
+    }
 }

@@ -6,7 +6,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.sjl.libtreeview.TreeViewAdapter;
 import com.sjl.libtreeview.bean.LayoutItem;
@@ -44,6 +46,18 @@ public class MainActivity extends Activity {
                 list.clear();
                 list.addAll(initRoot());
                 adapter.notifyData(list);
+            }
+        });
+        findViewById(R.id.btnCloseAll).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                adapter.closeAll();
+            }
+        });
+        ((ToggleButton)findViewById(R.id.tbChoose)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                adapter.setChangeParentCheck(isChecked);
             }
         });
 
