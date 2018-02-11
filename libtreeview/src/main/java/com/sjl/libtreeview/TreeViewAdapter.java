@@ -146,7 +146,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
         notifyItemRangeChanged(startPosition, checkChildren(currentNode, isChecked) + 1);
         //选中父节点
         TreeNode parentNode = currentNode.getParentNode();
-        while (parentNode != null&&changeParentCheck) {
+        while (parentNode != null && changeParentCheck) {
             int index = expandedList.indexOf(parentNode);
             parentNode.setChecked(isChecked);
             notifyItemChanged(index);
@@ -181,9 +181,9 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
         boolean isExpanded = currentNode.isExpanded();
         int startPosition = expandedList.indexOf(currentNode) + 1;
         if (isExpanded) {
-            notifyItemRangeRemoved(startPosition, removeNodes(currentNode, true,false));
+            notifyItemRangeRemoved(startPosition, removeNodes(currentNode, true, false));
         } else {
-            notifyItemRangeInserted(startPosition, insertNodes(currentNode, startPosition));
+            notifyItemRangeInserted(startPosition, insertNodes(currentNode, startPosition, false));
         }
     }
 
@@ -191,21 +191,24 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
      * 收拢时移除节点
      *
      * @param treeNode
-     * @param toggle
+     * @param toggle     需要改变当前结点展开收拢
+     * @param isCloseAll 是否收拢全部
      * @return
      */
-    private int removeNodes(TreeNode treeNode, boolean toggle,boolean closeAll) {
+    private int removeNodes(TreeNode treeNode, boolean toggle, boolean isCloseAll) {
         int count = 0;
         if (!treeNode.isLeaf()) {
             List<TreeNode> list = treeNode.getChildNodes();
             count += list.size();
             expandedList.removeAll(list);
             for (TreeNode item : list) {
-                if (item.isExpanded()) {
-                    if(closeAll){
-                        item.toggle();
-                    }
-                    count += removeNodes(item, false,closeAll);
+                if (item.isExpanded() && isCloseAll) {
+                    //已展开并且是展开全部时，关闭
+                    item.toggle();
+                }
+                if (item.isExpanded() || isCloseAll) {
+                    //已展开或者是展开全部的时候，移除子节点
+                    count += removeNodes(item, false, isCloseAll);
                 }
             }
         }
@@ -220,16 +223,21 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
      *
      * @param treeNode
      * @param startPosition
+     * @param isOpenAll     是否展开全部
      * @return
      */
-    private int insertNodes(TreeNode treeNode, int startPosition) {
+    private int insertNodes(TreeNode treeNode, int startPosition, boolean isOpenAll) {
         List<TreeNode> list = treeNode.getChildNodes();
         int count = 0;
         for (TreeNode item : list) {
-            expandedList.add(startPosition + count, item);
+            if (expandedList.indexOf(item) < 0) {
+                //添加时先查看是否已添加，防止展开全部时重复添加
+                expandedList.add(startPosition + count, item);
+            }
             count++;
-            if (item.isExpanded()) {
-                count += insertNodes(item, startPosition + count);
+            if (item.isExpanded() || isOpenAll) {
+                //已经展开或展开全部的时候
+                count += insertNodes(item, startPosition + count, isOpenAll);
             }
         }
         if (!treeNode.isExpanded()) {
@@ -239,17 +247,36 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
     }
 
     /**
-     * 关闭所有节点
+     * 获取跟节点列表
+     *
+     * @return
      */
-    public void closeAll(){
-        List<TreeNode> tmp = new ArrayList<>();
-        for (TreeNode treeNode :expandedList){
-            if(treeNode.isRoot()){
-                tmp.add(treeNode);
+    private List<TreeNode> getRootList() {
+        List<TreeNode> rootList = new ArrayList<>();
+        for (TreeNode treeNode : expandedList) {
+            if (treeNode.isRoot()) {
+                rootList.add(treeNode);
             }
         }
-        for (TreeNode treeNode:tmp){
-            removeNodes(treeNode,treeNode.isExpanded(),true);
+        return rootList;
+    }
+
+    /**
+     * 关闭所有节点
+     */
+    public void closeAll() {
+        for (TreeNode treeNode : getRootList()) {
+            removeNodes(treeNode, treeNode.isExpanded(), true);
+        }
+        notifyDataSetChanged();
+    }
+
+    /**
+     * 展开所有节点
+     */
+    public void openAll() {
+        for (TreeNode treeNode : getRootList()) {
+            insertNodes(treeNode, expandedList.indexOf(treeNode) + 1, true);
         }
         notifyDataSetChanged();
     }

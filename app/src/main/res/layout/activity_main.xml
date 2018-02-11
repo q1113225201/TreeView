@@ -13,6 +13,12 @@
         android:text="加载" />
 
     <Button
+        android:id="@+id/btnOpenAll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="展开所有" />
+
+    <Button
         android:id="@+id/btnCloseAll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

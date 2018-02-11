@@ -48,6 +48,12 @@ public class MainActivity extends Activity {
                 adapter.notifyData(list);
             }
         });
+        findViewById(R.id.btnOpenAll).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                adapter.openAll();
+            }
+        });
         findViewById(R.id.btnCloseAll).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
