@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
@@ -60,7 +59,7 @@ public class MainActivity extends Activity {
                 adapter.closeAll();
             }
         });
-        ((ToggleButton)findViewById(R.id.tbChoose)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        ((ToggleButton) findViewById(R.id.tbChoose)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 adapter.setChangeParentCheck(isChecked);
@@ -86,11 +85,8 @@ public class MainActivity extends Activity {
     private void initAdapter() {
         adapter = new TreeViewAdapter(list, Arrays.asList(new RootViewBinder(), new BranchViewBinder(), new LeafViewBinder())) {
             @Override
-            public void toggle(View view, TreeNode treeNode) {
-                if(!(treeNode.getValue() instanceof LeafNode)) {
-                    //非叶节点时，旋转动画，具体效果自行添加
-                    view.setRotation(view.getRotation() > 0 ? 0 : 90);
-                }
+            public void toggle(View view, boolean isOpen, TreeNode treeNode) {
+                view.setRotation(isOpen ? 90 : 0);
             }
 
             @Override
@@ -102,22 +98,23 @@ public class MainActivity extends Activity {
             public void itemClick(View view, TreeNode treeNode) {
                 String name = null;
                 LayoutItem item = treeNode.getValue();
-                if(item instanceof RootNode){
+                if (item instanceof RootNode) {
                     name = ((RootNode) item).getName();
-                }else if(item instanceof BranchNode){
+                } else if (item instanceof BranchNode) {
                     name = ((BranchNode) item).getName();
-                }else if(item instanceof LeafNode){
+                } else if (item instanceof LeafNode) {
                     name = ((LeafNode) item).getName();
                 }
                 Toast.makeText(MainActivity.this, name, Toast.LENGTH_SHORT).show();
             }
         };
-        rv.setAdapter(adapter);
         rv.setLayoutManager(new LinearLayoutManager(this));
+        rv.setAdapter(adapter);
     }
 
     /**
      * 初始化跟
+     *
      * @return
      */
     private List<TreeNode> initRoot() {
@@ -138,6 +135,7 @@ public class MainActivity extends Activity {
 
     /**
      * 初始化枝
+     *
      * @param name
      * @return
      */
@@ -162,6 +160,7 @@ public class MainActivity extends Activity {
 
     /**
      * 初始化叶
+     *
      * @param name
      * @return
      */

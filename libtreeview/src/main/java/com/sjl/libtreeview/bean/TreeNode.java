@@ -10,7 +10,7 @@ import java.util.List;
  * @date 2018/1/14
  */
 
-public class TreeNode<T extends LayoutItem> {
+public class TreeNode<T extends LayoutItem> implements Cloneable {
     /**
      * 当前节点值
      */
@@ -148,10 +148,10 @@ public class TreeNode<T extends LayoutItem> {
     }
 
     @Override
-    protected Object clone() throws CloneNotSupportedException {
+    public TreeNode<T> clone() throws CloneNotSupportedException {
         TreeNode<T> clone = new TreeNode<>(this.value);
         clone.expanded = this.expanded;
         clone.checked = this.checked;
-        return super.clone();
+        return clone;
     }
 }

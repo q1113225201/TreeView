@@ -1,5 +1,8 @@
 package com.sjl.libtreeview;
 
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,8 +21,18 @@ import java.util.List;
  * @date 2018/1/14
  */
 public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
+    /**
+     * 比较时不同点的关键字
+     */
+    private static final String KEY_EXPAND = "expand";
+    private static final String KEY_CHECK = "check";
+    /**
+     * 显示的展开列表
+     */
     protected List<TreeNode> expandedList = new ArrayList<>();
+    /**
+     * 布局绑定列表
+     */
     private List<? extends TreeViewBinder> viewBinders = new ArrayList<>();
     /**
      * 根据层级设置左边padding
@@ -97,16 +110,16 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
         holder.itemView.setPadding(expandedList.get(position).getLevel() * padding, 0, 0, 0);
-        for (final TreeViewBinder item : viewBinders) {
+        for (TreeViewBinder item : viewBinders) {
             if (item.getLayoutId() == expandedList.get(position).getValue().getLayoutId()) {
-                item.bindViewHolder(holder, position, expandedList.get(holder.getLayoutPosition()));
+                item.bindViewHolder(holder, position, expandedList.get(position));
                 if (item.getToggleId() != 0) {
                     //展开收拢状态切换
                     ((TreeViewBinder.ViewHolder) holder).findViewById(item.getToggleId()).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            toggle(expandedList.get(holder.getLayoutPosition()));
-                            toggle(v, expandedList.get(holder.getLayoutPosition()));
+                            boolean isOpen = toggle(expandedList.get(holder.getLayoutPosition()));
+                            toggle(v, isOpen, expandedList.get(holder.getLayoutPosition()));
                         }
                     });
                 }
@@ -131,6 +144,23 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
                 }
             }
         }
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List<Object> payloads) {
+        if (payloads != null && !payloads.isEmpty()) {
+            Bundle bundle = (Bundle) payloads.get(0);
+            TreeNode currentNode = expandedList.get(position);
+            for (String key : bundle.keySet()) {
+                if (KEY_EXPAND.equals(key) && currentNode.getValue().getToggleId() != 0) {
+                    toggle(((TreeViewBinder.ViewHolder) holder).findViewById(currentNode.getValue().getToggleId()), bundle.getBoolean(key), currentNode);
+                }
+                if (KEY_CHECK.equals(key) && currentNode.getValue().getCheckedId() != 0) {
+                    checked(((TreeViewBinder.ViewHolder) holder).findViewById(currentNode.getValue().getCheckedId()), bundle.getBoolean(key), currentNode);
+                }
+            }
+        }
+        super.onBindViewHolder(holder, position, payloads);
     }
 
     /**
@@ -177,7 +207,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
      *
      * @param currentNode
      */
-    public void toggle(TreeNode currentNode) {
+    public boolean toggle(TreeNode currentNode) {
         boolean isExpanded = currentNode.isExpanded();
         int startPosition = expandedList.indexOf(currentNode) + 1;
         if (isExpanded) {
@@ -185,6 +215,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
         } else {
             notifyItemRangeInserted(startPosition, insertNodes(currentNode, startPosition, false));
         }
+        return !isExpanded;
     }
 
     /**
@@ -247,6 +278,102 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
     }
 
     /**
+     * 关闭所有节点
+     */
+    public void closeAll() {
+        List<TreeNode> cloneList = cloneList(expandedList);
+        List<TreeNode> rootList = getRootList();
+        for (TreeNode treeNode : rootList) {
+            removeNodes(treeNode, treeNode.isExpanded(), true);
+        }
+//        notifyDataSetChanged();
+        notifyDiff(cloneList);
+    }
+
+    /**
+     * 展开所有节点
+     */
+    public void openAll() {
+        List<TreeNode> cloneList = cloneList(expandedList);
+        List<TreeNode> rootList = getRootList();
+        for (TreeNode treeNode : rootList) {
+            insertNodes(treeNode, expandedList.indexOf(treeNode) + 1, true);
+        }
+//        notifyDataSetChanged();
+        notifyDiff(cloneList);
+    }
+
+    /**
+     * 列表克隆
+     * @param list
+     * @return
+     */
+    private List<TreeNode> cloneList(List<TreeNode> list) {
+        List<TreeNode> result = new ArrayList<>();
+        for (TreeNode treeNode : list) {
+            try {
+                result.add(treeNode.clone());
+            } catch (CloneNotSupportedException e) {
+                result.add(treeNode);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 更新列表
+     * @param oldList
+     */
+    private void notifyDiff(final List<TreeNode> oldList) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+            @Override
+            public int getOldListSize() {
+                return oldList.size();
+            }
+
+            @Override
+            public int getNewListSize() {
+                return expandedList.size();
+            }
+
+            @Override
+            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                TreeNode oldTreeNode = oldList.get(oldItemPosition);
+                TreeNode newTreeNode = expandedList.get(newItemPosition);
+                return oldTreeNode.getValue() != null && oldTreeNode.getValue().equals(newTreeNode.getValue());
+            }
+
+            @Override
+            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                TreeNode oldTreeNode = oldList.get(oldItemPosition);
+                TreeNode newTreeNode = expandedList.get(newItemPosition);
+                return oldTreeNode.getValue() != null && oldTreeNode.getValue().equals(newTreeNode.getValue()) &&
+                        oldTreeNode.isExpanded() == newTreeNode.isExpanded() &&
+                        oldTreeNode.isChecked() == newTreeNode.isChecked();
+            }
+
+            @Nullable
+            @Override
+            public Object getChangePayload(int oldItemPosition, int newItemPosition) {
+                TreeNode oldTreeNode = oldList.get(oldItemPosition);
+                TreeNode newTreeNode = expandedList.get(newItemPosition);
+                Bundle bundle = new Bundle();
+                if (oldTreeNode.isExpanded() != newTreeNode.isExpanded()) {
+                    bundle.putBoolean(KEY_EXPAND, newTreeNode.isExpanded());
+                }
+                if (oldTreeNode.isChecked() != newTreeNode.isChecked()) {
+                    bundle.putBoolean(KEY_CHECK, newTreeNode.isChecked());
+                }
+                if (bundle.size() == 0) {
+                    bundle = null;
+                }
+                return bundle;
+            }
+        });
+        diffResult.dispatchUpdatesTo(this);
+    }
+
+    /**
      * 获取跟节点列表
      *
      * @return
@@ -259,26 +386,6 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
             }
         }
         return rootList;
-    }
-
-    /**
-     * 关闭所有节点
-     */
-    public void closeAll() {
-        for (TreeNode treeNode : getRootList()) {
-            removeNodes(treeNode, treeNode.isExpanded(), true);
-        }
-        notifyDataSetChanged();
-    }
-
-    /**
-     * 展开所有节点
-     */
-    public void openAll() {
-        for (TreeNode treeNode : getRootList()) {
-            insertNodes(treeNode, expandedList.indexOf(treeNode) + 1, true);
-        }
-        notifyDataSetChanged();
     }
 
     @Override
@@ -302,7 +409,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
         this.changeParentCheck = changeParentCheck;
     }
 
-    public abstract void toggle(View view, TreeNode treeNode);
+    public abstract void toggle(View view, boolean isOpen, TreeNode treeNode);
 
     public abstract void checked(View view, boolean checked, TreeNode treeNode);
 
