@@ -11,11 +11,22 @@
 - 全部展开和全部收拢功能
 
 ## 添加依赖
+仓库
+```
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
 ([最新版本](https://github.com/q1113225201/TreeView/releases/latest))
 
-``compile 'com.github.q1113225201:TreeView:1.1.0'``
+```
+compile 'com.github.q1113225201:TreeView:1.1.0'
+```
 
-具体使用可参考[博客](http://blog.csdn.net/q1113225201/article/details/79252546)或[项目中MainActivity.java](https://github.com/q1113225201/TreeView/blob/master/app/src/main/java/com/sjl/treeview/MainActivity.java)
+具体使用可参考[博客](http://blog.csdn.net/q1113225201/article/details/79328247)或[项目中MainActivity.java](https://github.com/q1113225201/TreeView/blob/master/app/src/main/java/com/sjl/treeview/MainActivity.java)
 
 ## 效果展示
 ![url](show.gif)

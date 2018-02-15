@@ -234,11 +234,11 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
             expandedList.removeAll(list);
             for (TreeNode item : list) {
                 if (item.isExpanded() && isCloseAll) {
-                    //已展开并且是展开全部时，关闭
+                    //已展开并且是收拢全部时，关闭
                     item.toggle();
                 }
                 if (item.isExpanded() || isCloseAll) {
-                    //已展开或者是展开全部的时候，移除子节点
+                    //已展开或者是收拢全部的时候，移除子节点
                     count += removeNodes(item, false, isCloseAll);
                 }
             }
@@ -283,6 +283,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
     public void closeAll() {
         List<TreeNode> cloneList = cloneList(expandedList);
         List<TreeNode> rootList = getRootList();
+        //在根节点列表上做遍历操作，关闭所有节点
         for (TreeNode treeNode : rootList) {
             removeNodes(treeNode, treeNode.isExpanded(), true);
         }
@@ -296,6 +297,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
     public void openAll() {
         List<TreeNode> cloneList = cloneList(expandedList);
         List<TreeNode> rootList = getRootList();
+        //在根节点列表上做遍历操作，展开所有节点
         for (TreeNode treeNode : rootList) {
             insertNodes(treeNode, expandedList.indexOf(treeNode) + 1, true);
         }
@@ -359,9 +361,11 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
                 TreeNode newTreeNode = expandedList.get(newItemPosition);
                 Bundle bundle = new Bundle();
                 if (oldTreeNode.isExpanded() != newTreeNode.isExpanded()) {
+                    //展开状态不同
                     bundle.putBoolean(KEY_EXPAND, newTreeNode.isExpanded());
                 }
                 if (oldTreeNode.isChecked() != newTreeNode.isChecked()) {
+                    //选中状态不同
                     bundle.putBoolean(KEY_CHECK, newTreeNode.isChecked());
                 }
                 if (bundle.size() == 0) {
