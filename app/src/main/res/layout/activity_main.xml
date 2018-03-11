@@ -31,6 +31,17 @@
         android:textOff="不选中父节点"
         android:textOn="选中父节点" />
 
+    <Button
+        android:id="@+id/btnShowAll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="显示全部" />
+
+    <EditText
+        android:id="@+id/etKeyWord"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv"
         android:layout_width="match_parent"

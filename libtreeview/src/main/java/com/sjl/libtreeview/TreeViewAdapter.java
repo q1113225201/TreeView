@@ -29,6 +29,10 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
     /**
      * 显示的展开列表
      */
+    protected List<TreeNode> originList = new ArrayList<>();
+    /**
+     * 显示的展开列表
+     */
     protected List<TreeNode> expandedList = new ArrayList<>();
     /**
      * 布局绑定列表
@@ -49,11 +53,20 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
     public TreeViewAdapter(List<TreeNode> list, List<? extends TreeViewBinder> viewBinders) {
         this.viewBinders = viewBinders;
+        this.originList = list;
         if (list != null) {
             buildExpandedList(list);
         }
     }
 
+    /**
+     * 同步数据
+     */
+    public void notifyData(List<TreeNode> list) {
+        this.originList = list;
+        buildExpandedList(list);
+        notifyDataSetChanged();
+    }
     /**
      * 构建显示的展开列表
      *
@@ -80,14 +93,6 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
                 buildNodes(expandedList, item.getChildNodes());
             }
         }
-    }
-
-    /**
-     * 同步数据
-     */
-    public void notifyData(List<TreeNode> list) {
-        buildExpandedList(list);
-        notifyDataSetChanged();
     }
 
     @Override
@@ -207,7 +212,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
      *
      * @param currentNode
      */
-    public boolean toggle(TreeNode currentNode) {
+    private boolean toggle(TreeNode currentNode) {
         boolean isExpanded = currentNode.isExpanded();
         int startPosition = expandedList.indexOf(currentNode) + 1;
         if (isExpanded) {
@@ -281,12 +286,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
      * 关闭所有节点
      */
     public void closeAll() {
-        List<TreeNode> cloneList = cloneList(expandedList);
-        List<TreeNode> rootList = getRootList();
-        //在根节点列表上做遍历操作，关闭所有节点
-        for (TreeNode treeNode : rootList) {
-            removeNodes(treeNode, treeNode.isExpanded(), true);
-        }
+        List<TreeNode> cloneList = closeAllNodes();
 //        notifyDataSetChanged();
         notifyDiff(cloneList);
     }
@@ -294,19 +294,41 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
     /**
      * 展开所有节点
      */
+    private List<TreeNode> closeAllNodes() {
+        List<TreeNode> cloneList = cloneList(expandedList);
+        List<TreeNode> rootList = getRootList();
+        //在根节点列表上做遍历操作，关闭所有节点
+        for (TreeNode treeNode : rootList) {
+            removeNodes(treeNode, treeNode.isExpanded(), true);
+        }
+        return cloneList;
+    }
+
+    /**
+     * 展开所有节点
+     */
     public void openAll() {
+        List<TreeNode> cloneList = openAllNodes();
+//        notifyDataSetChanged();
+        notifyDiff(cloneList);
+    }
+
+    /**
+     * 展开所有节点
+     */
+    private List<TreeNode> openAllNodes() {
         List<TreeNode> cloneList = cloneList(expandedList);
         List<TreeNode> rootList = getRootList();
         //在根节点列表上做遍历操作，展开所有节点
         for (TreeNode treeNode : rootList) {
             insertNodes(treeNode, expandedList.indexOf(treeNode) + 1, true);
         }
-//        notifyDataSetChanged();
-        notifyDiff(cloneList);
+        return cloneList;
     }
 
     /**
      * 列表克隆
+     *
      * @param list
      * @return
      */
@@ -324,6 +346,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
     /**
      * 更新列表
+     *
      * @param oldList
      */
     private void notifyDiff(final List<TreeNode> oldList) {

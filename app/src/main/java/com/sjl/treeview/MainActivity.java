@@ -4,8 +4,12 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -65,7 +69,30 @@ public class MainActivity extends Activity {
                 adapter.setChangeParentCheck(isChecked);
             }
         });
+        findViewById(R.id.btnShowAll).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //adapter.showAll();
+            }
+        });
+        ((EditText) findViewById(R.id.etKeyWord)).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(count!=0){
+                    //adapter.searchList(s.toString());
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
         TreeNode<RootNode> rootNode = new TreeNode<>(new RootNode("根节点"));
         TreeNode<BranchNode> branchNode1 = new TreeNode<>(new BranchNode("枝节点1"));
         TreeNode<BranchNode> branchNode2 = new TreeNode<>(new BranchNode("枝节点2"));
