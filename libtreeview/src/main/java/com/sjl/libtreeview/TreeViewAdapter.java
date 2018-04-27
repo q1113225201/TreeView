@@ -46,6 +46,18 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
      * 改变子节点选中是否改变父节点选中状态
      */
     private boolean changeParentCheck = false;
+    /**
+     * 记录最后点击的展开收拢节点的ViewHolder
+     */
+    private TreeViewBinder.ViewHolder lastToggleClickViewHolder;
+
+    public void setLastToggleClickViewHolder(TreeViewBinder.ViewHolder viewHolder) {
+        this.lastToggleClickViewHolder = viewHolder;
+    }
+
+    public TreeViewBinder.ViewHolder getLastToggleClickViewHolder() {
+        return lastToggleClickViewHolder;
+    }
 
     public TreeViewAdapter(List<? extends TreeViewBinder> viewBinders) {
         this(null, viewBinders);
@@ -67,6 +79,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
         buildExpandedList(list);
         notifyDataSetChanged();
     }
+
     /**
      * 构建显示的展开列表
      *
@@ -123,8 +136,9 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
                     ((TreeViewBinder.ViewHolder) holder).findViewById(item.getToggleId()).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            boolean isOpen = toggle(expandedList.get(holder.getLayoutPosition()));
-                            toggle(v, isOpen, expandedList.get(holder.getLayoutPosition()));
+                            //记录要展开的节点
+                            setLastToggleClickViewHolder((TreeViewBinder.ViewHolder) holder);
+                            toggleClick((TreeViewBinder.ViewHolder) holder, v, !expandedList.get(holder.getLayoutPosition()).isExpanded(), expandedList.get(holder.getLayoutPosition()));
                         }
                     });
                 }
@@ -134,7 +148,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
                         @Override
                         public void onClick(View v) {
                             boolean checked = checked(expandedList.get(holder.getLayoutPosition()));
-                            checked(v, checked, expandedList.get(holder.getLayoutPosition()));
+                            checked((TreeViewBinder.ViewHolder) holder, v, checked, expandedList.get(holder.getLayoutPosition()));
                         }
                     });
                 }
@@ -143,7 +157,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
                     ((TreeViewBinder.ViewHolder) holder).findViewById(item.getClickId()).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            itemClick(v, expandedList.get(holder.getLayoutPosition()));
+                            itemClick((TreeViewBinder.ViewHolder) holder, v, expandedList.get(holder.getLayoutPosition()));
                         }
                     });
                 }
@@ -158,10 +172,10 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
             TreeNode currentNode = expandedList.get(position);
             for (String key : bundle.keySet()) {
                 if (KEY_EXPAND.equals(key) && currentNode.getValue().getToggleId() != 0) {
-                    toggle(((TreeViewBinder.ViewHolder) holder).findViewById(currentNode.getValue().getToggleId()), bundle.getBoolean(key), currentNode);
+                    toggled((TreeViewBinder.ViewHolder) holder, ((TreeViewBinder.ViewHolder) holder).findViewById(currentNode.getValue().getToggleId()), bundle.getBoolean(key), currentNode);
                 }
                 if (KEY_CHECK.equals(key) && currentNode.getValue().getCheckedId() != 0) {
-                    checked(((TreeViewBinder.ViewHolder) holder).findViewById(currentNode.getValue().getCheckedId()), bundle.getBoolean(key), currentNode);
+                    checked((TreeViewBinder.ViewHolder) holder, ((TreeViewBinder.ViewHolder) holder).findViewById(currentNode.getValue().getCheckedId()), bundle.getBoolean(key), currentNode);
                 }
             }
         }
@@ -208,19 +222,28 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
     }
 
     /**
-     * 节点展开收拢
-     *
-     * @param currentNode
+     * 切换最后要展开收拢的节点
      */
-    private boolean toggle(TreeNode currentNode) {
-        boolean isExpanded = currentNode.isExpanded();
-        int startPosition = expandedList.indexOf(currentNode) + 1;
+    public void lastToggleClickToggle() {
+        toggle(getLastToggleClickViewHolder());
+    }
+
+    /**
+     * 节点展开收拢
+     */
+    public void toggle(TreeViewBinder.ViewHolder viewHolder) {
+        TreeNode treeNode = expandedList.get(viewHolder.getLayoutPosition());
+        boolean isExpanded = treeNode.isExpanded();
+        int startPosition = expandedList.indexOf(treeNode) + 1;
         if (isExpanded) {
-            notifyItemRangeRemoved(startPosition, removeNodes(currentNode, true, false));
+            notifyItemRangeRemoved(startPosition, removeNodes(treeNode, true, false));
         } else {
-            notifyItemRangeInserted(startPosition, insertNodes(currentNode, startPosition, false));
+            notifyItemRangeInserted(startPosition, insertNodes(treeNode, startPosition, false));
         }
-        return !isExpanded;
+        //调用展开收拢后操作
+        toggled(viewHolder,
+                viewHolder.findViewById(expandedList.get(viewHolder.getLayoutPosition()).getValue().getToggleId()),
+                !isExpanded, treeNode);
     }
 
     /**
@@ -292,7 +315,7 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
     }
 
     /**
-     * 展开所有节点
+     * 关闭所有节点
      */
     private List<TreeNode> closeAllNodes() {
         List<TreeNode> cloneList = cloneList(expandedList);
@@ -436,10 +459,16 @@ public abstract class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.
         this.changeParentCheck = changeParentCheck;
     }
 
-    public abstract void toggle(View view, boolean isOpen, TreeNode treeNode);
+    //展开收拢点击
+    public abstract void toggleClick(TreeViewBinder.ViewHolder viewHolder, View view, boolean isOpen, TreeNode treeNode);
 
-    public abstract void checked(View view, boolean checked, TreeNode treeNode);
+    //展开收拢后
+    public abstract void toggled(TreeViewBinder.ViewHolder viewHolder, View view, boolean isOpen, TreeNode treeNode);
 
-    public abstract void itemClick(View view, TreeNode treeNode);
+    //选中后
+    public abstract void checked(TreeViewBinder.ViewHolder viewHolder, View view, boolean checked, TreeNode treeNode);
+
+    //每条点击
+    public abstract void itemClick(TreeViewBinder.ViewHolder viewHolder, View view, TreeNode treeNode);
 
 }

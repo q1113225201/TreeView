@@ -32,7 +32,7 @@ public class BranchNode implements LayoutItem {
 
     @Override
     public int getToggleId() {
-        return R.id.ivNode;
+        return R.id.tvName;
     }
 
     @Override
@@ -42,6 +42,6 @@ public class BranchNode implements LayoutItem {
 
     @Override
     public int getClickId() {
-        return R.id.tvName;
+        return R.id.ivNode;
     }
 }
