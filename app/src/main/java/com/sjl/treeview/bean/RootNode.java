@@ -32,7 +32,7 @@ public class RootNode implements LayoutItem {
 
     @Override
     public int getToggleId() {
-        return R.id.tvName;
+        return R.id.ivNode;
     }
 
     @Override
@@ -42,6 +42,6 @@ public class RootNode implements LayoutItem {
 
     @Override
     public int getClickId() {
-        return R.id.ivNode;
+        return R.id.tvName;
     }
 }

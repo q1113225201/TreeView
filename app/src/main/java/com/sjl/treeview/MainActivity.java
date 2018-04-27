@@ -72,12 +72,6 @@ public class MainActivity extends Activity {
                 adapter.setChangeParentCheck(isChecked);
             }
         });
-        findViewById(R.id.btnShowAll).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //adapter.showAll();
-            }
-        });
         ((EditText) findViewById(R.id.etKeyWord)).addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -184,6 +178,7 @@ public class MainActivity extends Activity {
             }
         },1000);
     }
+
     private ProgressDialog progressDialog;
     private void autoProgress(boolean show){
         if(progressDialog==null){
